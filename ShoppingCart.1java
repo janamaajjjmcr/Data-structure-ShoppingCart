@@ -1,0 +1,179 @@
+import java.util.LinkedList;
+import java.util.Scanner;
+
+public class ShoppingCart {
+    private LinkedList<Item> cartItems;
+
+    public ShoppingCart() {
+        cartItems = new LinkedList<>();
+    }
+
+    public void addItem(String itemName, double price, int quantity) {
+        cartItems.add(new Item(itemName, price, quantity));
+    }
+
+    public void removeItem(int index, int quantityToRemove) {
+        if (index >= 0 && index < cartItems.size()) {
+            Item item = cartItems.get(index);
+            int currentQuantity = item.getQuantity();
+            if (quantityToRemove <= currentQuantity) {
+                if (quantityToRemove == currentQuantity) {
+                    cartItems.remove(index);
+                } else {
+                    item.setQuantity(currentQuantity - quantityToRemove);
+                }
+                System.out.println("Item removed successfully.");
+            } else {
+                System.out.println("Invalid quantity. Please enter a quantity less than or equal to " + currentQuantity);
+            }
+        } else {
+            System.out.println("Invalid item index. Please select a valid item to remove.");
+        }
+    }
+
+    public boolean containsItem(String itemName) {
+        for (Item item : cartItems) {
+            if (item.getName().equals(itemName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public double getItemPrice(int index) {
+        if (index >= 0 && index < cartItems.size()) {
+            return cartItems.get(index).getPrice();
+        }
+        return 0.0;
+    }
+
+    public int getItemQuantity(int index) {
+        if (index >= 0 && index < cartItems.size()) {
+            return cartItems.get(index).getQuantity();
+        }
+        return 0;
+    }
+
+    public void printCart() {
+        System.out.println("Shopping Cart:");
+        for (int i = 0; i < cartItems.size(); i++) {
+            Item item = cartItems.get(i);
+            System.out.println(
+                    (i + 1) + ". " + item.getName() + " (Price: $" + item.getPrice() + ") - Quantity: " + item.getQuantity()
+            );
+        }
+    }
+
+    public double getTotalPrice() {
+        double totalPrice = 0.0;
+        for (Item item : cartItems) {
+            totalPrice += item.getPrice() * item.getQuantity();
+        }
+        return totalPrice;
+    }
+
+    private static class Item {
+        private String name;
+        private double price;
+        private int quantity;
+
+        public Item(String name, double price, int quantity) {
+            this.name = name;
+            this.price = price;
+            this.quantity = quantity;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public double getPrice() {
+            return price;
+        }
+
+        public int getQuantity() {
+            return quantity;
+        }
+
+        public void setQuantity(int quantity) {
+            this.quantity = quantity;
+        }
+    }
+
+    public static void main(String[] args) {
+        ShoppingCart cart = new ShoppingCart();
+        Scanner scanner = new Scanner(System.in);
+
+        // Set initial prices
+        cart.addItem("Shirt", 30.0, 0);
+        cart.addItem("Pants", 70.0, 0);
+        cart.addItem("Shoes", 100.0, 0);
+        cart.addItem("Socks", 6.0, 0);
+
+        // Display menu
+        System.out.println("Welcome to the Shopping Cart!");
+        System.out.println("Select items to add to the cart by entering the item number:");
+        System.out.println("1. Shirt");
+        System.out.println("2. Pants");
+        System.out.println("3. Shoes");
+        System.out.println("4. Socks");
+        System.out.println("0. Done");
+
+        while (true) {
+            System.out.print("Enter your choice (0-4): ");
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+
+            if (choice == 0) {
+                break;
+            } else if (choice >= 1 && choice <= 4) {
+                System.out.print("Enter the quantity: ");
+                int quantity = scanner.nextInt();
+                scanner.nextLine(); // Consume newline
+
+                double itemPrice = cart.getItemPrice(choice - 1);
+                cart.addItem(cart.cartItems.get(choice - 1).getName(), itemPrice, quantity);
+            } else {
+                System.out.println("Invalid choice. Please select a valid option.");
+            }
+        }
+
+        // Print the cart
+        System.out.println("\nYour Shopping Cart:");
+        cart.printCart();
+
+        // Remove an item from the cart
+        System.out.print("Do you want to remove an item from the cart? (yes/no): ");
+        String removeChoice = scanner.nextLine();
+        if (removeChoice.equalsIgnoreCase("yes")) {
+            System.out.print("Enter the item number to remove: ");
+            int itemToRemove = scanner.nextInt();
+            scanner.nextLine(); //Consume newline
+
+
+            if (itemToRemove >= 1 && itemToRemove <= cart.cartItems.size()) {
+                System.out.print("Enter the quantity to remove: ");
+                int quantityToRemove = scanner.nextInt();
+                scanner.nextLine(); // Consume newline
+
+                int itemIndex = itemToRemove - 1;
+                int itemQuantity = cart.getItemQuantity(itemIndex);
+                if (quantityToRemove <= itemQuantity) {
+                    cart.removeItem(itemIndex, quantityToRemove);
+                } else {
+                    System.out.println("Invalid quantity. The selected item has a quantity of " + itemQuantity);
+                }
+            } else {
+                System.out.println("Invalid item number. Please select a valid item to remove.");
+            }
+        }
+
+        // Print the updated cart
+        System.out.println("\nUpdated Shopping Cart:");
+        cart.printCart();
+
+        // Get the total price of the cart
+        double totalPrice = cart.getTotalPrice();
+        System.out.println("\nTotal Price for Selected Items: $" + totalPrice);
+    }
+ }
